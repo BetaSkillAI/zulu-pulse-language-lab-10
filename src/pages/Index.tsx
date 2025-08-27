@@ -12,6 +12,7 @@ const Index = () => {
   
   // Set document title
   document.title = pageTitle;
+  
   const features = [
     {
       icon: BookOpen,
@@ -44,218 +45,185 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section with Animated Background */}
-      <section className="relative bg-gradient-animated text-primary-foreground overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        
-        {/* Floating Elements */}
-        <div className="absolute top-20 left-10 w-20 h-20 bg-primary-glow/20 rounded-full animate-float"></div>
-        <div className="absolute top-40 right-20 w-32 h-32 bg-accent/20 rounded-full animate-float-delayed"></div>
-        <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-primary/30 rounded-full animate-float"></div>
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-br from-green-600 to-green-800 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="animate-slide-right">
-              <h1 className="text-5xl lg:text-6xl font-bold mb-6 leading-tight animate-bounce-in text-white drop-shadow-lg">
+            <div>
+              <h1 className="text-5xl lg:text-6xl font-bold mb-6 leading-tight">
                 Learn Zulu with
-                <span className="block text-primary-glow glow-primary drop-shadow-lg">Heart & Soul</span>
+                <span className="block text-green-200">Heart & Soul</span>
               </h1>
-              <p className="text-xl mb-8 text-white/95 leading-relaxed animate-slide-up drop-shadow-md">
+              <p className="text-xl mb-8 text-green-100 leading-relaxed">
                 Discover the beautiful Zulu language through interactive lessons, 
                 traditional music, and authentic cultural experiences. 
                 Start your journey today!
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-up">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/courses">
-                  <Button size="lg" className="bg-white text-primary hover:bg-white/95 shadow-warm hover-lift hover-glow font-semibold">
+                  <Button size="lg" className="bg-white text-green-600 hover:bg-gray-100 font-semibold">
                     <Play className="h-5 w-5 mr-2" />
                     Start Learning Free
                   </Button>
                 </Link>
                 <Link to="/contact">
-                  <Button size="lg" variant="outline" className="border-white/80 bg-white/10 text-white hover:bg-white/20 hover-lift backdrop-blur-sm">
+                  <Button size="lg" variant="outline" className="border-white/80 bg-white/10 text-white hover:bg-white/20">
                     Have Questions?
                   </Button>
                 </Link>
               </div>
             </div>
-            <div className="relative animate-slide-left">
+            <div className="relative">
               <img 
                 src={heroImage} 
                 alt="Learn Zulu - Interactive language learning with cultural experiences" 
-                className="rounded-lg shadow-warm w-full h-auto hover-lift"
+                className="rounded-lg shadow-lg w-full h-auto"
                 loading="eager"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg"></div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Stats Section with Staggered Animation */}
-      <section className="py-16 bg-gradient-secondary border-b">
+      {/* Stats Section */}
+      <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 animate-stagger-children">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
-              <div key={index} className="text-center hover-lift">
-                <div className="text-3xl lg:text-4xl font-bold text-primary mb-2 glow-primary">
+              <div key={index} className="text-center">
+                <div className="text-3xl lg:text-4xl font-bold text-green-600 mb-2">
                   {stat.number}
                 </div>
-                <div className="text-muted-foreground">{stat.label}</div>
+                <div className="text-gray-600">{stat.label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Features Section with Modern Glassmorphism Design */}
-      <section className="py-20 bg-gradient-to-br from-background via-card/50 to-background relative overflow-hidden">
-        {/* Animated Background Elements */}
-        <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full blur-3xl animate-pulse opacity-30"></div>
-        <div className="absolute bottom-1/4 right-1/3 w-80 h-80 bg-gradient-to-l from-accent/30 to-primary/30 rounded-full blur-3xl animate-pulse opacity-20 animate-[pulse_3s_ease-in-out_infinite_1s]"></div>
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-20 animate-fade-in">
-            <h2 className="text-5xl font-bold text-foreground mb-6 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+      {/* Features Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">
               Why Choose Learn Zulu?
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Experience the most comprehensive and culturally authentic Zulu learning platform designed for modern learners
             </p>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
-              <div 
-                key={index} 
-                className="group relative animate-fade-in hover-scale"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                {/* Glassmorphism Card */}
-                <div className="relative bg-gradient-to-br from-card/80 via-card/60 to-card/40 backdrop-blur-xl border border-white/20 rounded-2xl p-8 text-center transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:border-primary/30 hover:-translate-y-2">
-                  {/* Glow Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  
-                  {/* Icon Container with Advanced Animation */}
-                  <div className="relative mb-6">
-                    <div className="w-20 h-20 bg-gradient-to-br from-primary via-primary-glow to-accent rounded-2xl mx-auto flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-xl shadow-primary/30">
-                      <feature.icon className="h-10 w-10 text-primary-foreground drop-shadow-lg" />
+              <div key={index} className="group">
+                <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1">
+                  <CardContent className="p-6 text-center">
+                                         <div className="w-16 h-16 bg-green-100 rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                       <feature.icon className="h-8 w-8 text-green-600" />
                     </div>
-                    {/* Floating Ring Animation */}
-                    <div className="absolute inset-0 w-20 h-20 mx-auto border-2 border-primary/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 group-hover:scale-125 transition-all duration-700"></div>
-                  </div>
-                  
-                  {/* Content */}
-                  <h3 className="text-2xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors duration-300">
-                    {feature.title}
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed group-hover:text-foreground/80 transition-colors duration-300">
-                    {feature.description}
-                  </p>
-                  
-                  {/* Animated Border */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary via-accent to-primary opacity-0 group-hover:opacity-20 transition-opacity duration-500 blur-xl"></div>
-                </div>
-                
-                {/* Interactive Particles */}
-                <div className="absolute top-4 right-4 w-2 h-2 bg-accent rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping transition-all duration-500"></div>
-                <div className="absolute bottom-4 left-4 w-1 h-1 bg-primary rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping transition-all duration-700"></div>
+                                         <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-green-600 transition-colors">
+                      {feature.title}
+                    </h3>
+                    <p className="text-gray-600 leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </CardContent>
+                </Card>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Learning Path Section with Animated Background */}
-      <section className="py-20 bg-gradient-animated relative">
-        <div className="absolute inset-0 bg-background/90"></div>
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Learning Path Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="animate-slide-right">
-              <h2 className="text-4xl font-bold text-foreground mb-6">
+            <div>
+              <h2 className="text-4xl font-bold text-gray-900 mb-8">
                 Your Zulu Learning Journey
               </h2>
-              <div className="space-y-6 animate-stagger-children">
-                <div className="flex items-start space-x-4 hover-lift">
-                  <div className="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center glow-primary">
-                    <CheckCircle className="h-5 w-5 text-primary-foreground" />
+              <div className="space-y-6">
+                <div className="flex items-start space-x-4">
+                  <div className="flex-shrink-0 w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                    <CheckCircle className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground">Start with Basics</h3>
-                    <p className="text-muted-foreground">Learn essential greetings, family terms, and everyday expressions</p>
+                    <h3 className="text-lg font-semibold text-gray-900">Start with Basics</h3>
+                    <p className="text-gray-600">Learn essential greetings, family terms, and everyday expressions</p>
                   </div>
                 </div>
-                <div className="flex items-start space-x-4 hover-lift">
-                  <div className="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center glow-primary">
-                    <CheckCircle className="h-5 w-5 text-primary-foreground" />
+                <div className="flex items-start space-x-4">
+                  <div className="flex-shrink-0 w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                    <CheckCircle className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground">Practice Speaking</h3>
-                    <p className="text-muted-foreground">Use our voice recognition to perfect your pronunciation</p>
+                    <h3 className="text-lg font-semibold text-gray-900">Practice Speaking</h3>
+                    <p className="text-gray-600">Use our voice recognition to perfect your pronunciation</p>
                   </div>
                 </div>
-                <div className="flex items-start space-x-4 hover-lift">
-                  <div className="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center glow-primary">
-                    <CheckCircle className="h-5 w-5 text-primary-foreground" />
+                <div className="flex items-start space-x-4">
+                  <div className="flex-shrink-0 w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                    <CheckCircle className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground">Immerse in Culture</h3>
-                    <p className="text-muted-foreground">Learn through traditional songs and cultural stories</p>
+                    <h3 className="text-lg font-semibold text-gray-900">Immerse in Culture</h3>
+                    <p className="text-gray-600">Learn through traditional songs and cultural stories</p>
                   </div>
                 </div>
               </div>
               <Link to="/courses" className="inline-block mt-8">
-                <Button size="lg" className="bg-gradient-primary hover-lift hover-glow">
+                <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white">
                   Start Your Journey
                 </Button>
               </Link>
             </div>
-            <div className="grid grid-cols-2 gap-4 animate-slide-left">
-              <Card className="hover-lift hover-glow transition-all bg-card/80 backdrop-blur-sm">
+            <div className="grid grid-cols-2 gap-4">
+              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">Beginner</CardTitle>
+                  <CardTitle className="text-lg text-gray-900">Beginner</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground mb-3">8 lessons • 45 minutes</p>
+                  <p className="text-sm text-gray-600 mb-3">8 lessons • 45 minutes</p>
                   <div className="flex items-center">
-                    <Star className="h-4 w-4 fill-current text-accent mr-1" />
-                    <span className="text-sm">Perfect for beginners</span>
+                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
+                    <span className="text-sm text-gray-700">Perfect for beginners</span>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="hover-lift hover-glow transition-all bg-card/80 backdrop-blur-sm">
+              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">Intermediate</CardTitle>
+                  <CardTitle className="text-lg text-gray-900">Intermediate</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground mb-3">15 lessons • 2 hours</p>
+                  <p className="text-sm text-gray-600 mb-3">15 lessons • 2 hours</p>
                   <div className="flex items-center">
-                    <Star className="h-4 w-4 fill-current text-primary mr-1" />
-                    <span className="text-sm">Build confidence</span>
+                    <Star className="h-4 w-4 fill-blue-400 text-blue-400 mr-1" />
+                    <span className="text-sm text-gray-700">Build confidence</span>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="hover-lift hover-glow transition-all bg-card/80 backdrop-blur-sm">
+              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">Advanced</CardTitle>
+                  <CardTitle className="text-lg text-gray-900">Advanced</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground mb-3">25 lessons • 4 hours</p>
+                  <p className="text-sm text-gray-600 mb-3">25 lessons • 4 hours</p>
                   <div className="flex items-center">
-                    <Star className="h-4 w-4 fill-current text-destructive mr-1" />
-                    <span className="text-sm">Master the language</span>
+                    <Star className="h-4 w-4 fill-purple-400 text-purple-400 mr-1" />
+                    <span className="text-sm text-gray-700">Master the language</span>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="hover-lift hover-glow transition-all bg-card/80 backdrop-blur-sm">
+              <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">Cultural</CardTitle>
+                  <CardTitle className="text-lg text-gray-900">Cultural</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground mb-3">50+ songs • Ongoing</p>
+                  <p className="text-sm text-gray-600 mb-3">50+ songs • Ongoing</p>
                   <div className="flex items-center">
-                    <Music className="h-4 w-4 text-accent mr-1" />
-                    <span className="text-sm">Songs & stories</span>
+                    <Music className="h-4 w-4 text-green-500 mr-1" />
+                    <span className="text-sm text-gray-700">Songs & stories</span>
                   </div>
                 </CardContent>
               </Card>
@@ -264,29 +232,23 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA Section with Enhanced Gradient */}
-      <section className="py-20 bg-gradient-animated text-primary-foreground relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/10"></div>
-        
-        {/* Floating Elements */}
-        <div className="absolute top-10 left-20 w-24 h-24 bg-primary-glow/20 rounded-full animate-float"></div>
-        <div className="absolute bottom-10 right-20 w-32 h-32 bg-accent/20 rounded-full animate-float-delayed"></div>
-        
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6 animate-bounce-in text-white drop-shadow-lg">
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-green-600 to-green-800 text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl font-bold mb-6">
             Ready to Start Your Zulu Adventure?
           </h2>
-          <p className="text-xl mb-8 text-white/95 animate-slide-up drop-shadow-md">
+          <p className="text-xl mb-8 text-green-100">
             Join thousands of learners discovering the beauty of the Zulu language and culture
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/courses">
-              <Button size="lg" className="bg-white text-primary hover:bg-white/95 hover-lift hover-glow font-semibold">
+              <Button size="lg" className="bg-white text-green-600 hover:bg-gray-100 font-semibold">
                 Start Learning Now
               </Button>
             </Link>
             <Link to="/contact">
-              <Button size="lg" variant="outline" className="border-white/80 bg-white/10 text-white hover:bg-white/20 hover-lift backdrop-blur-sm">
+              <Button size="lg" variant="outline" className="border-white/80 bg-white/10 text-white hover:bg-white/20">
                 Have Questions?
               </Button>
             </Link>

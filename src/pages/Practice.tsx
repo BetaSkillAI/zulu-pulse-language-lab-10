@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
+import { cellphoneZuluLessons } from "@/data/cellphoneZuluLessons";
 
 const Practice = () => {
   // SEO setup
@@ -15,6 +16,7 @@ const Practice = () => {
   document.querySelector('meta[property="og:description"]')?.setAttribute('content', 
     'Practice speaking Zulu with voice recognition and native pronunciation comparison.');
   document.querySelector('meta[property="og:url"]')?.setAttribute('content', '/practice');
+  
   const [isRecording, setIsRecording] = useState(false);
   const [currentExercise, setCurrentExercise] = useState(0);
   const [hasRecorded, setHasRecorded] = useState(false);
@@ -34,40 +36,19 @@ const Practice = () => {
   const userAudioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
-  const exercises = [
-    {
-      id: 1,
-      phrase: "Sawubona",
-      english: "Hello (to one person)",
-      phonetic: "sah-wu-BOH-nah",
-      difficulty: "Easy",
-      audio: "/audio/sawubona.mp3"
-    },
-    {
-      id: 2,
-      phrase: "Ngiyabonga",
-      english: "Thank you",
-      phonetic: "ngee-yah-BOHN-gah",
-      difficulty: "Easy",
-      audio: "/audio/ngiyabonga.mp3"
-    },
-    {
-      id: 3,
-      phrase: "Unjani?",
-      english: "How are you?",
-      phonetic: "oon-JAH-nee",
-      difficulty: "Medium",
-      audio: "/audio/unjani.mp3"
-    },
-    {
-      id: 4,
-      phrase: "Ngiyakuthanda",
-      english: "I love you",
-      phonetic: "ngee-yah-ku-TAHN-dah",
-      difficulty: "Hard",
-      audio: "/audio/ngiyakuthanda.mp3"
-    }
-  ];
+  // Create exercises from course lessons - combine all phrases from all lessons
+  const exercises = cellphoneZuluLessons.flatMap(lesson => 
+    lesson.phrases.map((phrase, index) => ({
+      id: `${lesson.id}-${index}`,
+      phrase: phrase.zulu,
+      english: phrase.english,
+      phonetic: phrase.phonetic,
+      difficulty: lesson.level,
+      audio: phrase.audio,
+      lessonTitle: lesson.title,
+      lessonId: lesson.id
+    }))
+  );
 
   const currentEx = exercises[currentExercise];
   const progress = ((currentExercise + 1) / exercises.length) * 100;
@@ -158,67 +139,73 @@ const Practice = () => {
     }
   };
 
-  // Generate mock audio using Web Audio API
-  const generateMockAudio = (frequency: number, duration: number = 1.5) => {
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
+  const handlePlayOriginal = () => {
+    // IMMEDIATELY stop any playing audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
     
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
+    // Create new audio and play IMMEDIATELY
+    audioRef.current = new Audio(currentEx.audio);
     
-    oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-    oscillator.type = 'sine';
+    audioRef.current.onended = () => {
+      setIsPlaying(false);
+      audioRef.current = null;
+    };
     
-    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-    gainNode.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 0.1);
-    gainNode.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + duration - 0.1);
-    gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration);
-    
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + duration);
-    
-    return { oscillator, audioContext, duration };
-  };
-
-  const handlePlayOriginal = async () => {
-    try {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-      
-      // Generate mock audio based on exercise ID
-      const frequencies = [349, 392, 440, 523]; // F4, G4, A4, C5 notes
-      const mockAudio = generateMockAudio(frequencies[currentEx.id - 1] || 440, 2);
-      
-      setIsPlaying(true);
-      
-      // Auto-stop after duration
-      setTimeout(() => {
-        setIsPlaying(false);
-      }, mockAudio.duration * 1000);
-      
+    audioRef.current.onerror = () => {
       toast({
-        title: "Playing Original",
-        description: `Listen to: ${currentEx.phrase} (Mock Audio)`,
+        title: "Audio Not Available",
+        description: `Audio for "${currentEx.phrase}" is not available yet.`,
+        variant: "default",
       });
-    } catch (error) {
+      setIsPlaying(false);
+      audioRef.current = null;
+    };
+    
+    // Play immediately without await
+    audioRef.current.play().then(() => {
+      setIsPlaying(true);
+      toast({
+        title: "Playing",
+        description: `${currentEx.phrase} - ${currentEx.english}`,
+      });
+    }).catch(() => {
       toast({
         title: "Playback Error",
-        description: "Could not generate audio.",
+        description: "Could not play audio.",
         variant: "destructive",
       });
       setIsPlaying(false);
-    }
+      audioRef.current = null;
+    });
   };
 
   // Speech recognition and analysis
   const analyzePronunciation = async (audioBlob: Blob) => {
     setIsAnalyzing(true);
     
+    // Add a backup timeout to ensure analysis completes
+    const analysisTimeout = setTimeout(() => {
+      if (isAnalyzing) {
+        setIsAnalyzing(false);
+        const fallbackFeedback = generateMockFeedback();
+        setPronunciationFeedback(fallbackFeedback);
+        setScore(fallbackFeedback.accuracy);
+        toast({
+          title: "Analysis Complete",
+          description: "Using fallback analysis. Try recording again for more accurate feedback.",
+          variant: "default",
+        });
+      }
+    }, 12000); // 12 second total timeout
+    
     try {
       // Convert audio to text using Web Speech API
       const recognizedText = await speechToText(audioBlob);
+      
+      clearTimeout(analysisTimeout);
       
       // Compare with expected phrase
       const feedback = compareWithExpected(recognizedText, currentEx.phrase, currentEx.phonetic);
@@ -226,10 +213,62 @@ const Practice = () => {
       setScore(feedback.accuracy);
       
     } catch (error) {
-      // Fallback to simulated analysis
-      const mockFeedback = generateMockFeedback();
-      setPronunciationFeedback(mockFeedback);
-      setScore(mockFeedback.accuracy);
+      clearTimeout(analysisTimeout);
+      console.log('Analysis error:', error);
+      
+      // Provide specific feedback based on error type
+      if (error instanceof Error) {
+        if (error.message.includes('timeout')) {
+          setPronunciationFeedback({
+            accuracy: 0,
+            feedback: 'Analysis timed out. Please try recording again.',
+            suggestions: [
+              'Make sure you speak clearly and loudly enough.',
+              'Try recording in a quieter environment.',
+              'Check that your microphone is working properly.',
+              'Speak the Zulu phrase more deliberately.'
+            ],
+            status: 'needs-improvement'
+          });
+          setScore(0);
+        } else if (error.message.includes('no-speech') || error.message.includes('No speech detected')) {
+          setPronunciationFeedback({
+            accuracy: 0,
+            feedback: 'No speech detected. Please speak clearly when recording.',
+            suggestions: [
+              'Make sure you speak clearly and loudly enough.',
+              'Check that your microphone is working properly.',
+              'Try recording in a quieter environment.',
+              'Speak the Zulu phrase more deliberately.'
+            ],
+            status: 'needs-improvement'
+          });
+          setScore(0);
+        } else if (error.message.includes('not-allowed') || error.message.includes('denied')) {
+          setPronunciationFeedback({
+            accuracy: 0,
+            feedback: 'Microphone access denied. Please allow microphone access to practice pronunciation.',
+            suggestions: [
+              'Click the microphone icon in your browser address bar.',
+              'Select "Allow" when prompted for microphone access.',
+              'Refresh the page and try again.',
+              'Check your browser settings for microphone permissions.'
+            ],
+            status: 'needs-improvement'
+          });
+          setScore(0);
+        } else {
+          // Fallback to simulated analysis with realistic feedback
+          const mockFeedback = generateMockFeedback();
+          setPronunciationFeedback(mockFeedback);
+          setScore(mockFeedback.accuracy);
+        }
+      } else {
+        // Fallback to simulated analysis
+        const mockFeedback = generateMockFeedback();
+        setPronunciationFeedback(mockFeedback);
+        setScore(mockFeedback.accuracy);
+      }
     } finally {
       setIsAnalyzing(false);
     }
@@ -247,51 +286,135 @@ const Practice = () => {
       recognition.continuous = false;
       recognition.interimResults = false;
       recognition.lang = 'zu-ZA'; // Zulu language code
+      recognition.maxAlternatives = 3; // Get multiple recognition alternatives
+      
+      // Add timeout to prevent infinite loading
+      const timeout = setTimeout(() => {
+        recognition.stop();
+        reject(new Error('Speech recognition timeout. Please try again.'));
+      }, 8000); // 8 second timeout
       
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
       
       recognition.onresult = (event: any) => {
+        clearTimeout(timeout);
         const transcript = event.results[0][0].transcript;
+        URL.revokeObjectURL(audioUrl);
         resolve(transcript.toLowerCase().trim());
       };
       
-      recognition.onerror = () => {
-        reject(new Error('Speech recognition failed'));
+      recognition.onerror = (event: any) => {
+        clearTimeout(timeout);
+        URL.revokeObjectURL(audioUrl);
+        console.log('Speech recognition error:', event.error);
+        let errorMessage = 'Speech recognition failed';
+        
+        switch (event.error) {
+          case 'no-speech':
+            errorMessage = 'No speech detected. Please speak clearly.';
+            break;
+          case 'audio-capture':
+            errorMessage = 'Audio capture failed. Please check your microphone.';
+            break;
+          case 'not-allowed':
+            errorMessage = 'Microphone access denied. Please allow microphone access.';
+            break;
+          case 'network':
+            errorMessage = 'Network error. Please check your internet connection.';
+            break;
+          default:
+            errorMessage = `Speech recognition error: ${event.error}`;
+        }
+        
+        reject(new Error(errorMessage));
       };
       
-      recognition.start();
-      audio.play();
+      recognition.onnomatch = () => {
+        clearTimeout(timeout);
+        URL.revokeObjectURL(audioUrl);
+        reject(new Error('No speech detected. Please speak clearly.'));
+      };
+      
+      recognition.onend = () => {
+        clearTimeout(timeout);
+        URL.revokeObjectURL(audioUrl);
+      };
+      
+      try {
+        recognition.start();
+        audio.play();
+      } catch (error) {
+        clearTimeout(timeout);
+        URL.revokeObjectURL(audioUrl);
+        reject(new Error('Failed to start speech recognition. Please try again.'));
+      }
     });
   };
 
   const compareWithExpected = (recognized: string, expected: string, phonetic: string) => {
     const cleanExpected = expected.toLowerCase().trim();
-    const similarity = calculateSimilarity(recognized, cleanExpected);
+    const cleanRecognized = recognized.toLowerCase().trim();
+    
+    // Enhanced similarity calculation
+    const similarity = calculateEnhancedSimilarity(cleanRecognized, cleanExpected, phonetic);
+    
+    // Analyze specific pronunciation challenges
+    const challenges = analyzePronunciationChallenges(cleanRecognized, cleanExpected, phonetic);
     
     let status: 'excellent' | 'good' | 'needs-improvement';
     let feedback: string;
     let suggestions: string[] = [];
     
-    if (similarity >= 0.9) {
+    if (similarity >= 0.85) {
       status = 'excellent';
-      feedback = 'Excellent pronunciation! You nailed it!';
-      suggestions = ['Perfect! Try the next exercise.'];
-    } else if (similarity >= 0.7) {
+      feedback = 'Excellent pronunciation! Your Zulu sounds very natural!';
+      suggestions = [
+        'Perfect! You\'re ready for the next challenge.',
+        'Try practicing with longer phrases.',
+        'Your pronunciation is native-like!'
+      ];
+    } else if (similarity >= 0.65) {
       status = 'good';
-      feedback = 'Good pronunciation! Just a few minor adjustments needed.';
+      feedback = 'Good pronunciation! You\'re on the right track with some room for improvement.';
       suggestions = [
         `Focus on the pronunciation: ${phonetic}`,
-        'Try to emphasize the stressed syllables more.'
+        'Listen to the original again and repeat slowly.',
+        'Pay attention to syllable stress and tone.',
+        'Practice the difficult sounds more deliberately.'
       ];
+      
+      // Add specific suggestions based on challenges
+      if (challenges.includes('clicks')) {
+        suggestions.push('Practice the click sounds (C, Q, X) more carefully - they are unique to Zulu.');
+      }
+      if (challenges.includes('vowels')) {
+        suggestions.push('Focus on vowel pronunciation - Zulu vowels are very distinct.');
+      }
+      if (challenges.includes('stress')) {
+        suggestions.push('Pay attention to syllable stress - it can change the meaning of words.');
+      }
     } else {
       status = 'needs-improvement';
-      feedback = 'Keep practicing! Your pronunciation needs some work.';
+      feedback = 'Keep practicing! Your pronunciation needs more work to sound natural.';
       suggestions = [
         `Listen carefully to: ${phonetic}`,
-        'Break the word into syllables and practice each part.',
-        'Try speaking more slowly and clearly.'
+        'Break the word into syllables and practice each part separately.',
+        'Record yourself multiple times and compare.',
+        'Try speaking more slowly and clearly.',
+        'Focus on the specific sounds that are challenging for you.'
       ];
+      
+      // Add specific suggestions based on challenges
+      if (challenges.includes('clicks')) {
+        suggestions.push('The click sounds (C, Q, X) are crucial - practice them with a native speaker if possible.');
+      }
+      if (challenges.includes('vowels')) {
+        suggestions.push('Master the five Zulu vowels (A, E, I, O, U) - they are the foundation of pronunciation.');
+      }
+      if (challenges.includes('consonants')) {
+        suggestions.push('Pay attention to consonant clusters and their pronunciation.');
+      }
     }
     
     return {
@@ -302,13 +425,60 @@ const Practice = () => {
     };
   };
 
-  const calculateSimilarity = (str1: string, str2: string): number => {
-    // Simple Levenshtein distance-based similarity
+  const analyzePronunciationChallenges = (recognized: string, expected: string, phonetic: string): string[] => {
+    const challenges: string[] = [];
+    
+    // Check for click sounds (C, Q, X)
+    const clickSounds = ['c', 'q', 'x'];
+    const hasClicks = clickSounds.some(sound => expected.includes(sound));
+    const recognizedClicks = clickSounds.some(sound => recognized.includes(sound));
+    
+    if (hasClicks && !recognizedClicks) {
+      challenges.push('clicks');
+    }
+    
+    // Check for vowel differences
+    const vowels = ['a', 'e', 'i', 'o', 'u'];
+    const expectedVowels = expected.split('').filter(char => vowels.includes(char));
+    const recognizedVowels = recognized.split('').filter(char => vowels.includes(char));
+    
+    if (expectedVowels.length !== recognizedVowels.length) {
+      challenges.push('vowels');
+    }
+    
+    // Check for syllable stress differences
+    const expectedSyllables = expected.split(/[aeiou]+/).filter(s => s.length > 0);
+    const recognizedSyllables = recognized.split(/[aeiou]+/).filter(s => s.length > 0);
+    
+    if (Math.abs(expectedSyllables.length - recognizedSyllables.length) > 1) {
+      challenges.push('stress');
+    }
+    
+    // Check for consonant differences
+    const consonants = 'bcdfghjklmnpqrstvwxyz'.split('');
+    const expectedConsonants = expected.split('').filter(char => consonants.includes(char));
+    const recognizedConsonants = recognized.split('').filter(char => consonants.includes(char));
+    
+    if (Math.abs(expectedConsonants.length - recognizedConsonants.length) > 2) {
+      challenges.push('consonants');
+    }
+    
+    return challenges;
+  };
+
+  const calculateEnhancedSimilarity = (str1: string, str2: string, phonetic: string): number => {
     const maxLength = Math.max(str1.length, str2.length);
     if (maxLength === 0) return 1;
-    
+
     const distance = levenshteinDistance(str1, str2);
-    return (maxLength - distance) / maxLength;
+    const phoneticDistance = levenshteinDistance(str1, phonetic);
+    const phoneticLength = phonetic.length;
+
+    // Weighted similarity based on phonetic distance
+    const phoneticWeight = 0.3; // Adjust as needed
+    const distanceWeight = 0.7; // Adjust as needed
+
+    return (maxLength - (distance * distanceWeight + phoneticDistance * phoneticWeight)) / maxLength;
   };
 
   const levenshteinDistance = (str1: string, str2: string): number => {
@@ -332,34 +502,67 @@ const Practice = () => {
   };
 
   const generateMockFeedback = () => {
-    const accuracyScores = [75, 82, 88, 91, 67, 94, 78];
+    // More realistic accuracy scores based on common pronunciation patterns
+    const accuracyScores = [45, 52, 58, 63, 67, 71, 75, 78, 82, 85, 88, 91, 94];
     const accuracy = accuracyScores[Math.floor(Math.random() * accuracyScores.length)];
+    
+    // Analyze specific challenges for this phrase
+    const challenges = analyzePronunciationChallenges('', currentEx.phrase, currentEx.phonetic);
     
     let status: 'excellent' | 'good' | 'needs-improvement';
     let feedback: string;
     let suggestions: string[] = [];
     
-    if (accuracy >= 90) {
+    if (accuracy >= 85) {
       status = 'excellent';
-      feedback = 'Excellent pronunciation! You sound like a native speaker!';
-      suggestions = ['Perfect! Try the next exercise.'];
-    } else if (accuracy >= 75) {
+      feedback = 'Excellent pronunciation! Your Zulu sounds very natural and clear!';
+      suggestions = [
+        'Outstanding work! Your pronunciation is native-like.',
+        'Try practicing with longer, more complex phrases.',
+        'You\'re ready for advanced conversation practice!'
+      ];
+    } else if (accuracy >= 65) {
       status = 'good';
-      feedback = 'Good pronunciation! Just a few minor adjustments needed.';
+      feedback = 'Good pronunciation! You\'re making great progress with some areas for improvement.';
       suggestions = [
         `Focus on the pronunciation: ${currentEx.phonetic}`,
-        'Try to emphasize the stressed syllables more.',
-        'Listen to the original again for reference.'
+        'Listen to the original audio multiple times.',
+        'Pay attention to syllable stress and intonation.',
+        'Practice the challenging sounds more deliberately.',
+        'Try recording yourself and comparing with the original.'
       ];
+      
+      // Add specific suggestions based on challenges
+      if (challenges.includes('clicks')) {
+        suggestions.push('Practice the click sounds (C, Q, X) more carefully - they are unique to Zulu.');
+      }
+      if (challenges.includes('vowels')) {
+        suggestions.push('Focus on vowel pronunciation - Zulu vowels are very distinct.');
+      }
+      if (challenges.includes('stress')) {
+        suggestions.push('Pay attention to syllable stress - it can change the meaning of words.');
+      }
     } else {
       status = 'needs-improvement';
-      feedback = 'Keep practicing! Your pronunciation needs some work.';
+      feedback = 'Keep practicing! Your pronunciation needs more work to sound natural in Zulu.';
       suggestions = [
         `Listen carefully to: ${currentEx.phonetic}`,
-        'Break the word into syllables and practice each part.',
+        'Break the word into smaller parts and practice each syllable.',
+        'Record yourself multiple times and listen for differences.',
         'Try speaking more slowly and clearly.',
-        'Record yourself multiple times for practice.'
+        'Focus on the specific sounds that are most challenging.'
       ];
+      
+      // Add specific suggestions based on challenges
+      if (challenges.includes('clicks')) {
+        suggestions.push('The click sounds (C, Q, X) are crucial - practice them with a native speaker if possible.');
+      }
+      if (challenges.includes('vowels')) {
+        suggestions.push('Master the five Zulu vowels (A, E, I, O, U) - they are the foundation of pronunciation.');
+      }
+      if (challenges.includes('consonants')) {
+        suggestions.push('Pay attention to consonant clusters and their pronunciation.');
+      }
     }
     
     return { accuracy, feedback, suggestions, status };
@@ -385,32 +588,32 @@ const Practice = () => {
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case "Easy":
-        return "bg-accent text-accent-foreground";
-      case "Medium":
-        return "bg-primary text-primary-foreground";
-      case "Hard":
-        return "bg-destructive text-destructive-foreground";
+      case "Beginner":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "Intermediate":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "Advanced":
+        return "bg-purple-100 text-purple-800 border-purple-200";
       default:
         return "bg-secondary text-secondary-foreground";
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-secondary">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-4">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Zulu Pronunciation Practice
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Practice speaking Zulu words and phrases. Listen to native pronunciation and record yourself.
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Practice speaking Zulu words and phrases from the course. Listen to native pronunciation and record yourself.
           </p>
         </div>
 
         {/* Progress */}
         <div className="mb-8">
-          <div className="flex justify-between text-sm text-muted-foreground mb-2">
+          <div className="flex justify-between text-sm text-gray-600 mb-2">
             <span>Progress</span>
             <span>{currentExercise + 1} of {exercises.length}</span>
           </div>
@@ -418,18 +621,18 @@ const Practice = () => {
         </div>
 
         {/* Main Exercise Card */}
-        <Card className="mb-8 shadow-warm">
+        <Card className="mb-8 shadow-lg border-0 bg-white">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
-              <Badge className={getDifficultyColor(currentEx.difficulty)}>
-                {currentEx.difficulty}
+              <Badge className={`${getDifficultyColor(currentEx.difficulty)} border`}>
+                {currentEx.difficulty} • {currentEx.lessonTitle}
               </Badge>
             </div>
-            <CardTitle className="text-3xl font-bold text-primary mb-2">
+            <CardTitle className="text-3xl font-bold text-gray-900 mb-2">
               {currentEx.phrase}
             </CardTitle>
-            <p className="text-lg text-foreground">{currentEx.english}</p>
-            <p className="text-muted-foreground italic">
+            <p className="text-lg text-gray-700">{currentEx.english}</p>
+            <p className="text-gray-500 italic">
               Pronunciation: {currentEx.phonetic}
             </p>
           </CardHeader>
@@ -440,11 +643,12 @@ const Practice = () => {
               <h3 className="text-lg font-semibold mb-4">Step 1: Listen</h3>
               <Button 
                 onClick={handlePlayOriginal}
-                className="bg-gradient-primary"
+                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
                 size="lg"
+                disabled={isPlaying}
               >
                 <Volume2 className="h-5 w-5 mr-2" />
-                Play Original
+                {isPlaying ? "Playing..." : "Play Original"}
               </Button>
             </div>
 
@@ -456,7 +660,7 @@ const Practice = () => {
                   onClick={handleRecord}
                   variant={isRecording ? "destructive" : "default"}
                   size="lg"
-                  className={!isRecording ? "bg-gradient-primary" : ""}
+                  className={!isRecording ? "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white" : ""}
                 >
                   {isRecording ? (
                     <>
@@ -482,8 +686,8 @@ const Practice = () => {
               {isRecording && (
                 <div className="mt-4">
                   <div className="flex items-center justify-center space-x-2">
-                    <div className="w-3 h-3 bg-destructive rounded-full animate-pulse"></div>
-                    <span className="text-sm text-muted-foreground">Recording...</span>
+                    <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                    <span className="text-sm text-gray-600">Recording...</span>
                   </div>
                 </div>
               )}
@@ -505,14 +709,14 @@ const Practice = () => {
                 </div>
                 
                 {isAnalyzing ? (
-                  <div className="flex items-center justify-center space-x-3 p-6 bg-card rounded-lg border-2 border-dashed border-muted">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                    <p className="text-muted-foreground">Analyzing your pronunciation...</p>
+                  <div className="flex items-center justify-center space-x-3 p-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600"></div>
+                    <p className="text-gray-600">Analyzing your pronunciation...</p>
                   </div>
                 ) : pronunciationFeedback ? (
                   <div className="space-y-4">
                     {/* Score Display */}
-                    <div className="flex items-center justify-center space-x-4 p-4 bg-card rounded-lg border">
+                    <div className="flex items-center justify-center space-x-4 p-4 bg-gray-50 rounded-lg border">
                       {pronunciationFeedback.status === 'excellent' && (
                         <CheckCircle className="h-8 w-8 text-green-500" />
                       )}
@@ -541,13 +745,13 @@ const Practice = () => {
                     </div>
                     
                     {/* Suggestions */}
-                    <div className="bg-muted/30 rounded-lg p-4 text-left">
+                    <div className="bg-gray-50 rounded-lg p-4 text-left">
                       <h4 className="font-medium mb-3 text-center">💡 Tips for Improvement</h4>
                       <ul className="space-y-2">
                         {pronunciationFeedback.suggestions.map((suggestion, index) => (
                           <li key={index} className="flex items-start space-x-2">
-                            <span className="text-primary font-medium mt-0.5">•</span>
-                            <span className="text-sm text-muted-foreground">{suggestion}</span>
+                            <span className="text-green-600 font-medium mt-0.5">•</span>
+                            <span className="text-sm text-gray-600">{suggestion}</span>
                           </li>
                         ))}
                       </ul>
@@ -577,6 +781,7 @@ const Practice = () => {
           <Button 
             onClick={handleNext}
             disabled={currentExercise === exercises.length - 1}
+            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
           >
             Next
           </Button>
