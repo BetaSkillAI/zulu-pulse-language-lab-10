@@ -14,9 +14,12 @@ const Music = () => {
   document.querySelector('meta[property="og:description"]')?.setAttribute('content', 
     'Learn Zulu through beautiful traditional songs with native pronunciation and cultural context.');
   document.querySelector('meta[property="og:url"]')?.setAttribute('content', '/music');
+  
   const [currentPlaying, setCurrentPlaying] = useState<number | null>(null);
   const [currentLine, setCurrentLine] = useState<number>(0);
+  const [karaokeActive, setKaraokeActive] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const currentLineRef = useRef<number>(0);
   const { toast } = useToast();
 
   const songs = [
@@ -79,6 +82,50 @@ const Music = () => {
         "Hear our prayers",
         "Lord bless us, your children"
       ]
+    },
+    {
+      id: 4,
+      title: "Ulithemba Lami",
+      artist: "Joyous Celebration",
+      duration: "5:30",
+      difficulty: "Intermediate",
+      audio: "/audio/ulithemba-lami.mp3",
+      zuluLyrics: [
+        "Uthando lwakho lujulile",
+        "Lususa ukwesaba ah",
+        "Alujiki lumi njalo",
+        "Lususa I- Izono",
+        "Uthando lwakho lujulile",
+        "Lususa ukwesaba ah",
+        "Alujiki lumi njalo",
+        "Lisusa I- Izono",
+        "Sohlala kuwe (sohlala kuwe)",
+        "Sohlala kuwe (nsuku zonke)",
+        "Thina (singabantwana bakho)",
+        "Wena wedwa (ufanelwe ukubongwa uyiNkosi yethu)",
+        "Sohlala kuwe (sohlala kuwe)",
+        "Sohlala kuwe (nsuku zonke)",
+        "Singabantwana (singabantwana bakho) hallelujah",
+        "Umusa wakho awuphezi uyasivikela ah"
+      ],
+      englishTranslation: [
+        "Your love is deep",
+        "It takes away fear, ah",
+        "It does not change, it stands firm",
+        "It removes sins",
+        "Your love is deep",
+        "It takes away fear, ah",
+        "It does not change, it stands firm",
+        "It removes sins",
+        "We will dwell in You (we will dwell in You)",
+        "We will dwell in You (every day)",
+        "We (are Your children)",
+        "You alone (deserve all the praise, You are our Lord)",
+        "We will dwell in You (we will dwell in You)",
+        "We will dwell in You (every day)",
+        "We are children (we are Your children) Hallelujah",
+        "Your mercy never ends, it protects us, ah"
+      ]
     }
   ];
 
@@ -103,6 +150,25 @@ const Music = () => {
       }
     };
   }, []);
+
+  // Karaoke progression effect
+  useEffect(() => {
+    if (!karaokeActive || currentPlaying !== 4) return;
+
+    console.log('🎵 Starting karaoke progression');
+    const interval = setInterval(() => {
+      setCurrentLine(prev => {
+        const next = (prev + 1) % 16; // 16 lines in the song
+        console.log(`🎵 Karaoke: Line ${next} - "${songs[3].zuluLyrics[next]}"`);
+        return next;
+      });
+    }, 3000);
+
+    return () => {
+      console.log('🎵 Stopping karaoke progression');
+      clearInterval(interval);
+    };
+  }, [karaokeActive, currentPlaying]);
 
   // Generate mock audio using Web Audio API
   const generateMockAudio = (frequency: number, duration: number = 2) => {
@@ -136,42 +202,223 @@ const Music = () => {
         // Stop current audio
         if (audioRef.current) {
           audioRef.current.pause();
+          audioRef.current = null;
         }
         setCurrentPlaying(null);
         setCurrentLine(0);
+        currentLineRef.current = 0;
+        console.log('🎵 Audio stopped manually');
       } else {
         // Stop any currently playing audio
         if (audioRef.current) {
           audioRef.current.pause();
         }
         
-        // Generate mock audio based on song ID
-        const frequencies = [440, 523, 659]; // A4, C5, E5 notes
-        const mockAudio = generateMockAudio(frequencies[songId - 1] || 440, song.zuluLyrics.length * 2);
-        
-        setCurrentPlaying(songId);
-        setCurrentLine(0);
-        
-        // Karaoke-style highlighting
-        const totalDuration = song.zuluLyrics.length * 2000; // 2 seconds per line
-        song.zuluLyrics.forEach((_, index) => {
-          setTimeout(() => {
-            if (currentPlaying === songId) {
-              setCurrentLine(index);
+        // Use actual audio for Ulithemba Lami (id: 4), mock audio for others
+        if (songId === 4) {
+          // Use actual audio file for Ulithemba Lami
+          const audio = new Audio(song.audio);
+          audioRef.current = audio;
+          
+          console.log('🎵 Attempting to load audio:', song.audio);
+          
+          // Vocal detection setup
+          let audioContext: AudioContext;
+          let analyser: AnalyserNode;
+          let source: MediaElementAudioSourceNode;
+          let vocalDetectionActive = false;
+          
+          // Custom timing for Ulithemba Lami - synchronized with actual vocals
+          const vocalTiming = [
+            0,      // "Uthando lwakho lujulile" - starts immediately
+            7000,   // "Lususa ukwesaba ah" - 7 seconds
+            14000,  // "Alujiki lumi njalo" - 14 seconds
+            21000,  // "Lususa I- Izono" - 21 seconds
+            28000,  // "Uthando lwakho lujulile" - 28 seconds (repeat)
+            35000,  // "Lususa ukwesaba ah" - 35 seconds
+            42000,  // "Alujiki lumi njalo" - 42 seconds
+            49000,  // "Lisusa I- Izono" - 49 seconds
+            56000,  // "Sohlala kuwe (sohlala kuwe)" - 56 seconds
+            63000,  // "Sohlala kuwe (nsuku zonke)" - 63 seconds
+            70000,  // "Thina (singabantwana bakho)" - 70 seconds
+            77000,  // "Wena wedwa (ufanelwe ukubongwa uyiNkosi yethu)" - 77 seconds
+            84000,  // "Sohlala kuwe (sohlala kuwe)" - 84 seconds
+            91000,  // "Sohlala kuwe (nsuku zonke)" - 91 seconds
+            98000,  // "Singabantwana (singabantwana bakho) hallelujah" - 98 seconds
+            105000  // "Umusa wakho awuphezi uyasivikela ah" - 105 seconds
+          ];
+          
+          const startVocalDetection = () => {
+            try {
+              audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+              analyser = audioContext.createAnalyser();
+              source = audioContext.createMediaElementSource(audio);
+              
+              source.connect(analyser);
+              analyser.connect(audioContext.destination);
+              
+              analyser.fftSize = 2048;
+              const bufferLength = analyser.frequencyBinCount;
+              const dataArray = new Uint8Array(bufferLength);
+              
+              vocalDetectionActive = true;
+              console.log('🎵 Vocal detection started');
+              
+              const detectVocals = () => {
+                if (!vocalDetectionActive) return;
+                
+                analyser.getByteFrequencyData(dataArray);
+                
+                // Analyze vocal frequencies (typically 85Hz - 255Hz for human voice)
+                let vocalEnergy = 0;
+                for (let i = 0; i < bufferLength; i++) {
+                  const frequency = i * audioContext.sampleRate / analyser.fftSize;
+                  if (frequency >= 85 && frequency <= 255) {
+                    vocalEnergy += dataArray[i];
+                  }
+                }
+                
+                const averageVocalEnergy = vocalEnergy / (bufferLength * 0.1); // Normalize
+                
+                // Get current audio time
+                const currentTime = audio.currentTime * 1000; // Convert to milliseconds
+                
+                // Find which line should be highlighted based on vocal timing
+                let currentLineIndex = 0;
+                for (let i = 0; i < vocalTiming.length; i++) {
+                  const nextTime = vocalTiming[i + 1] || Infinity;
+                  if (currentTime >= vocalTiming[i] && currentTime < nextTime) {
+                    currentLineIndex = i;
+                    break;
+                  }
+                }
+                
+                // Always update line based on timing, but log vocal energy
+                if (currentLineIndex !== currentLine) {
+                  setCurrentLine(currentLineIndex);
+                  console.log(`🎵 VOCAL: Line ${currentLineIndex} at ${currentTime}ms - "${songs[3].zuluLyrics[currentLineIndex]}" (Energy: ${averageVocalEnergy.toFixed(1)})`);
+                }
+                
+                // Log vocal energy every second for debugging
+                if (Math.floor(currentTime / 1000) !== Math.floor((currentTime - 16.67) / 1000)) {
+                  console.log(`🎵 Vocal Energy: ${averageVocalEnergy.toFixed(1)} at ${(currentTime/1000).toFixed(1)}s`);
+                }
+                
+                requestAnimationFrame(detectVocals);
+              };
+              
+              detectVocals();
+            } catch (error) {
+              console.error('Vocal detection error:', error);
+              // Fallback to simple timing
+              startSimpleTiming();
             }
-          }, index * 2000);
-        });
-        
-        // Auto-stop after duration
-        setTimeout(() => {
-          setCurrentPlaying(null);
+          };
+          
+          const startSimpleTiming = () => {
+            console.log('🎵 Using simple timing fallback');
+            let testLine = 0;
+            const testInterval = setInterval(() => {
+              testLine = (testLine + 1) % 16;
+              setCurrentLine(testLine);
+              console.log(`🎵 TIMING: Line ${testLine} - "${songs[3].zuluLyrics[testLine]}"`);
+            }, 3000);
+            
+            (window as any).testInterval = testInterval;
+          };
+          
+          // Backup timer to ensure lyrics move
+          const startBackupTimer = () => {
+            console.log('🎵 Starting backup timer (7 seconds)');
+            let backupLine = 0;
+            const backupInterval = setInterval(() => {
+              backupLine = (backupLine + 1) % 16;
+              setCurrentLine(backupLine);
+              console.log(`🎵 BACKUP: Line ${backupLine} - "${songs[3].zuluLyrics[backupLine]}"`);
+            }, 7000); // 7 seconds as requested
+            
+            (window as any).backupInterval = backupInterval;
+          };
+          
+          audio.addEventListener('loadeddata', () => {
+            console.log('🎵 Audio loaded successfully, duration:', audio.duration);
+            setCurrentPlaying(songId);
+            setCurrentLine(0);
+            audio.play();
+            
+            // Start vocal detection
+            startVocalDetection();
+            
+            // Start backup timer as safety net
+            setTimeout(() => {
+              startBackupTimer();
+            }, 1000);
+          });
+          
+          audio.addEventListener('ended', () => {
+            console.log('🎵 Song ended');
+            vocalDetectionActive = false;
+            if ((window as any).testInterval) {
+              clearInterval((window as any).testInterval);
+            }
+            if ((window as any).backupInterval) {
+              clearInterval((window as any).backupInterval);
+            }
+            setCurrentPlaying(null);
+            setCurrentLine(0);
+          });
+          
+          audio.addEventListener('error', (error) => {
+            console.error('Audio playback error:', error);
+            vocalDetectionActive = false;
+            if ((window as any).testInterval) {
+              clearInterval((window as any).testInterval);
+            }
+            if ((window as any).backupInterval) {
+              clearInterval((window as any).backupInterval);
+            }
+            toast({
+              title: "Playback Error", 
+              description: "Could not load audio file.",
+              variant: "destructive",
+            });
+            setCurrentPlaying(null);
+            setCurrentLine(0);
+          });
+          
+          toast({
+            title: "Now Playing",
+            description: `${song.title} by ${song.artist}`,
+          });
+        } else {
+          // Generate mock audio for other songs
+          const frequencies = [440, 523, 659]; // A4, C5, E5 notes
+          const mockAudio = generateMockAudio(frequencies[songId - 1] || 440, song.zuluLyrics.length * 2);
+          
+          setCurrentPlaying(songId);
           setCurrentLine(0);
-        }, totalDuration);
-        
-        toast({
-          title: "Now Playing",
-          description: `${song.title} by ${song.artist} (Mock Audio)`,
-        });
+          
+          // Karaoke-style highlighting
+          const totalDuration = song.zuluLyrics.length * 2000; // 2 seconds per line
+          song.zuluLyrics.forEach((_, index) => {
+            setTimeout(() => {
+              if (currentPlaying === songId) {
+                setCurrentLine(index);
+              }
+            }, index * 2000);
+          });
+          
+          // Auto-stop after duration
+          setTimeout(() => {
+            setCurrentPlaying(null);
+            setCurrentLine(0);
+          }, totalDuration);
+          
+          toast({
+            title: "Now Playing",
+            description: `${song.title} by ${song.artist} (Mock Audio)`,
+          });
+        }
       }
     } catch (error) {
       toast({
@@ -247,9 +494,11 @@ const Music = () => {
                       {song.zuluLyrics.map((line, index) => (
                         <p 
                           key={index} 
-                          className={`font-medium text-lg leading-relaxed transition-all duration-300 ${
+                          className={`font-medium text-lg leading-relaxed transition-all duration-500 ease-in-out ${
                             currentPlaying === song.id && currentLine === index
-                              ? "text-primary bg-primary/10 px-2 py-1 rounded-md shadow-sm scale-105"
+                              ? "text-primary bg-gradient-to-r from-primary/20 to-primary/10 px-4 py-2 rounded-lg shadow-lg scale-105 transform-gpu border-l-4 border-primary animate-pulse"
+                              : currentPlaying === song.id
+                              ? "text-foreground/60 opacity-70"
                               : "text-foreground"
                           }`}
                         >
