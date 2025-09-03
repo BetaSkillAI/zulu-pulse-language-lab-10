@@ -25,66 +25,6 @@ const Music = () => {
   const songs = [
     {
       id: 1,
-      title: "Shosholoza",
-      artist: "Traditional",
-      duration: "3:45",
-      difficulty: "Beginner",
-      audio: "/audio/shosholoza.mp3",
-      zuluLyrics: [
-        "Shosholoza, kulezo ntaba",
-        "Stimela siphume South Africa",
-        "Shosholoza, kulezo ntaba",
-        "Stimela siphume South Africa"
-      ],
-      englishTranslation: [
-        "Keep going, through those mountains",
-        "Train coming from South Africa",
-        "Keep going, through those mountains", 
-        "Train coming from South Africa"
-      ]
-    },
-    {
-      id: 2,
-      title: "Senzeni Na?",
-      artist: "Traditional Protest Song",
-      duration: "4:12",
-      difficulty: "Intermediate",
-      audio: "/audio/senzeni-na.mp3",
-      zuluLyrics: [
-        "Senzeni na? Senzeni na?",
-        "Sono sethu ubumnyama",
-        "Senzeni na? Senzeni na?",
-        "Sono sethu yinkulungwane"
-      ],
-      englishTranslation: [
-        "What have we done? What have we done?",
-        "Our sin is that we are black",
-        "What have we done? What have we done?",
-        "Our sin is our blackness"
-      ]
-    },
-    {
-      id: 3,
-      title: "Nkosi Sikelel' iAfrika",
-      artist: "Enoch Sontonga",
-      duration: "2:58",
-      difficulty: "Advanced",
-      audio: "/audio/nkosi-sikelel.mp3",
-      zuluLyrics: [
-        "Nkosi sikelel' iAfrika",
-        "Maluphakanyisw' uphondo lwayo",
-        "Yizwa imithandazo yethu",
-        "Nkosi sikelela, thina lusapho lwayo"
-      ],
-      englishTranslation: [
-        "Lord bless Africa",
-        "May her glory be lifted high",
-        "Hear our prayers",
-        "Lord bless us, your children"
-      ]
-    },
-    {
-      id: 4,
       title: "Ulithemba Lami",
       artist: "Joyous Celebration",
       duration: "5:30",
@@ -126,6 +66,66 @@ const Music = () => {
         "We are children (we are Your children) Hallelujah",
         "Your mercy never ends, it protects us, ah"
       ]
+    },
+    {
+      id: 2,
+      title: "Shosholoza",
+      artist: "Traditional",
+      duration: "3:45",
+      difficulty: "Beginner",
+      audio: "/audio/shosholoza.mp3",
+      zuluLyrics: [
+        "Shosholoza, kulezo ntaba",
+        "Stimela siphume South Africa",
+        "Shosholoza, kulezo ntaba",
+        "Stimela siphume South Africa"
+      ],
+      englishTranslation: [
+        "Keep going, through those mountains",
+        "Train coming from South Africa",
+        "Keep going, through those mountains", 
+        "Train coming from South Africa"
+      ]
+    },
+    {
+      id: 3,
+      title: "Senzeni Na?",
+      artist: "Traditional Protest Song",
+      duration: "4:12",
+      difficulty: "Intermediate",
+      audio: "/audio/senzeni-na.mp3",
+      zuluLyrics: [
+        "Senzeni na? Senzeni na?",
+        "Sono sethu ubumnyama",
+        "Senzeni na? Senzeni na?",
+        "Sono sethu yinkulungwane"
+      ],
+      englishTranslation: [
+        "What have we done? What have we done?",
+        "Our sin is that we are black",
+        "What have we done? What have we done?",
+        "Our sin is our blackness"
+      ]
+    },
+    {
+      id: 4,
+      title: "Nkosi Sikelel' iAfrika",
+      artist: "Enoch Sontonga",
+      duration: "2:58",
+      difficulty: "Advanced",
+      audio: "/audio/nkosi-sikelel.mp3",
+      zuluLyrics: [
+        "Nkosi sikelel' iAfrika",
+        "Maluphakanyisw' uphondo lwayo",
+        "Yizwa imithandazo yethu",
+        "Nkosi sikelela, thina lusapho lwayo"
+      ],
+      englishTranslation: [
+        "Lord bless Africa",
+        "May her glory be lifted high",
+        "Hear our prayers",
+        "Lord bless us, your children"
+      ]
     }
   ];
 
@@ -153,13 +153,13 @@ const Music = () => {
 
   // Karaoke progression effect
   useEffect(() => {
-    if (!karaokeActive || currentPlaying !== 4) return;
+    if (!karaokeActive || currentPlaying !== 1) return;
 
     console.log('🎵 Starting karaoke progression');
     const interval = setInterval(() => {
       setCurrentLine(prev => {
         const next = (prev + 1) % 16; // 16 lines in the song
-        console.log(`🎵 Karaoke: Line ${next} - "${songs[3].zuluLyrics[next]}"`);
+        console.log(`🎵 Karaoke: Line ${next} - "${songs[0].zuluLyrics[next]}"`);
         return next;
       });
     }, 3000);
@@ -214,8 +214,8 @@ const Music = () => {
           audioRef.current.pause();
         }
         
-        // Use actual audio for Ulithemba Lami (id: 4), mock audio for others
-        if (songId === 4) {
+        // Use actual audio for Ulithemba Lami (id: 1), mock audio for others
+        if (songId === 1) {
           // Use actual audio file for Ulithemba Lami
           const audio = new Audio(song.audio);
           audioRef.current = audio;
@@ -296,7 +296,7 @@ const Music = () => {
                 // Always update line based on timing, but log vocal energy
                 if (currentLineIndex !== currentLine) {
                   setCurrentLine(currentLineIndex);
-                  console.log(`🎵 VOCAL: Line ${currentLineIndex} at ${currentTime}ms - "${songs[3].zuluLyrics[currentLineIndex]}" (Energy: ${averageVocalEnergy.toFixed(1)})`);
+                  console.log(`🎵 VOCAL: Line ${currentLineIndex} at ${currentTime}ms - "${songs[0].zuluLyrics[currentLineIndex]}" (Energy: ${averageVocalEnergy.toFixed(1)})`);
                 }
                 
                 // Log vocal energy every second for debugging
@@ -321,7 +321,7 @@ const Music = () => {
             const testInterval = setInterval(() => {
               testLine = (testLine + 1) % 16;
               setCurrentLine(testLine);
-              console.log(`🎵 TIMING: Line ${testLine} - "${songs[3].zuluLyrics[testLine]}"`);
+              console.log(`🎵 TIMING: Line ${testLine} - "${songs[0].zuluLyrics[testLine]}"`);
             }, 3000);
             
             (window as any).testInterval = testInterval;
@@ -334,7 +334,7 @@ const Music = () => {
             const backupInterval = setInterval(() => {
               backupLine = (backupLine + 1) % 16;
               setCurrentLine(backupLine);
-              console.log(`🎵 BACKUP: Line ${backupLine} - "${songs[3].zuluLyrics[backupLine]}"`);
+              console.log(`🎵 BACKUP: Line ${backupLine} - "${songs[0].zuluLyrics[backupLine]}"`);
             }, 7000); // 7 seconds as requested
             
             (window as any).backupInterval = backupInterval;

@@ -118,10 +118,10 @@ const Index = () => {
               <div key={index} className="group">
                 <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1">
                   <CardContent className="p-6 text-center">
-                                         <div className="w-16 h-16 bg-green-100 rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:bg-green-200 transition-colors">
-                       <feature.icon className="h-8 w-8 text-green-600" />
+                    <div className="w-16 h-16 bg-green-100 rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                      <feature.icon className="h-8 w-8 text-green-600" />
                     </div>
-                                         <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-green-600 transition-colors">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-green-600 transition-colors">
                       {feature.title}
                     </h3>
                     <p className="text-gray-600 leading-relaxed">

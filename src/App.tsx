@@ -9,7 +9,6 @@ import Courses from "./pages/Courses";
 import LessonDetail from "./pages/LessonDetail";
 import Music from "./pages/Music";
 import Practice from "./pages/Practice";
-
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
@@ -29,9 +28,7 @@ const App = () => (
             <Route path="/lesson/:id" element={<LessonDetail />} />
             <Route path="/music" element={<Music />} />
             <Route path="/practice" element={<Practice />} />
-            
             <Route path="/contact" element={<Contact />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

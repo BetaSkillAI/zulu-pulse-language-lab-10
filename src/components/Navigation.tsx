@@ -19,34 +19,33 @@ const Navigation = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border animate-slide-down">
+    <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 group animate-slide-right">
-            <div className="flex items-center justify-center w-10 h-10 bg-gradient-primary rounded-lg group-hover:scale-105 transition-transform glow-primary animate-float">
-              <Globe className="h-6 w-6 text-primary-foreground" />
+          <Link to="/" className="flex items-center space-x-2">
+            <div className="flex items-center justify-center w-10 h-10 bg-green-600 rounded-lg">
+              <Globe className="h-6 w-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-foreground">Learn Zulu</span>
+            <span className="text-xl font-bold text-gray-900">Learn Zulu</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1 animate-slide-left">
-            {navItems.map((item, index) => (
+          <div className="hidden md:flex items-center space-x-1">
+            {navItems.map((item) => (
               <Link
                 key={item.name}
                 to={item.path}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-all hover-lift ${
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive(item.path)
-                    ? "bg-gradient-primary text-primary-foreground shadow-warm glow-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                    ? "bg-green-600 text-white"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 }`}
-                style={{ animationDelay: `${index * 0.1}s` }}
               >
                 {item.name}
               </Link>
             ))}
-            <Button variant="outline" className="ml-4 hover-lift hover-glow">
+            <Button variant="outline" className="ml-4">
               Get Started
             </Button>
           </div>
@@ -57,7 +56,7 @@ const Navigation = () => {
               variant="ghost"
               size="icon"
               onClick={() => setIsOpen(!isOpen)}
-              className="text-foreground hover-lift"
+              className="text-gray-600"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
@@ -66,24 +65,24 @@ const Navigation = () => {
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden animate-slide-down">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-card/90 backdrop-blur-sm rounded-lg mt-2 shadow-soft animate-stagger-children">
+          <div className="md:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 bg-white rounded-lg mt-2 shadow-lg">
               {navItems.map((item) => (
                 <Link
                   key={item.name}
                   to={item.path}
                   onClick={() => setIsOpen(false)}
-                  className={`block px-3 py-2 rounded-md text-base font-medium transition-all hover-lift ${
+                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
                     isActive(item.path)
-                      ? "bg-gradient-primary text-primary-foreground glow-primary"
-                      : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                      ? "bg-green-600 text-white"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                   }`}
                 >
                   {item.name}
                 </Link>
               ))}
               <div className="pt-2">
-                <Button variant="outline" className="w-full hover-lift hover-glow">
+                <Button variant="outline" className="w-full">
                   Get Started
                 </Button>
               </div>
