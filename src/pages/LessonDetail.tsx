@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { cellphoneZuluLessons, Lesson } from "@/data/cellphoneZuluLessons";
 import LessonQuiz from "@/components/LessonQuiz";
+import { useUserProgress } from "../contexts/UserProgressContext";
 
 const LessonDetail = () => {
   const { id } = useParams();
@@ -22,15 +23,23 @@ const LessonDetail = () => {
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
+  const { userProgress, markLessonComplete, updateStudyTime, getLessonProgress } = useUserProgress();
 
-  // Mock user data - in a real app this would come from context/API
-  const userStats = {
-    totalLessonsCompleted: 12,
-    currentStreak: 7,
-    averageScore: 87,
-    totalStudyTime: "8.5 hrs",
-    level: "Intermediate",
-    experience: 1250
+  // Get real user stats from progress data
+  const userStats = userProgress ? {
+    totalLessonsCompleted: userProgress.lessonsCompleted,
+    currentStreak: userProgress.currentStreak,
+    averageScore: userProgress.averageScore,
+    totalStudyTime: `${userProgress.studyTime.toFixed(1)} hrs`,
+    level: userProgress.currentLevel,
+    experience: Math.round(userProgress.lessonsCompleted * 50 + userProgress.studyTime * 10)
+  } : {
+    totalLessonsCompleted: 0,
+    currentStreak: 0,
+    averageScore: 0,
+    totalStudyTime: "0.0 hrs",
+    level: "Beginner",
+    experience: 0
   };
 
   // Check if this is a Cellphone Zulu course lesson
@@ -455,9 +464,18 @@ const LessonDetail = () => {
                     <LessonQuiz
                       questions={lesson.quiz}
                       onComplete={(score, total) => {
+                        const percentage = Math.round((score / total) * 100);
+                        const lessonId = `lesson-${lesson.lesson}`;
+                        
+                        // Mark lesson as complete in user progress
+                        markLessonComplete(lessonId, percentage, Math.round(timeSpent / 60));
+                        
+                        // Update study time
+                        updateStudyTime(Math.round(timeSpent / 60));
+                        
                         toast({
                           title: "Quiz Complete!",
-                          description: `You scored ${score} out of ${total} questions correctly!`,
+                          description: `You scored ${score} out of ${total} questions correctly! (${percentage}%)`,
                         });
                         setShowQuiz(false);
                       }}
@@ -587,7 +605,30 @@ const LessonDetail = () => {
                     Music & Songs
                   </Button>
                 </Link>
-                <Button variant="outline" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    const lessonId = `lesson-${lesson.lesson}`;
+                    const currentProgress = getLessonProgress(lessonId);
+                    
+                    if (!currentProgress?.completed) {
+                      // Mark lesson as complete without quiz
+                      markLessonComplete(lessonId, 75, Math.round(timeSpent / 60));
+                      updateStudyTime(Math.round(timeSpent / 60));
+                      
+                      toast({
+                        title: "Progress Saved!",
+                        description: "Your lesson progress has been saved.",
+                      });
+                    } else {
+                      toast({
+                        title: "Already Completed",
+                        description: "This lesson has already been completed.",
+                      });
+                    }
+                  }}
+                >
                   <Bookmark className="h-4 w-4 mr-2" />
                   Save Progress
                 </Button>

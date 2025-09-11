@@ -69,6 +69,84 @@ const Music = () => {
     },
     {
       id: 2,
+      title: "Jerusalema",
+      artist: "Master KG feat. Nomcebo",
+      duration: "5:30",
+      difficulty: "Intermediate",
+      audio: "/Voices/Master KG - Jerusalema [Feat (mp3cut.net) (1).mp3",
+      zuluLyrics: [
+        "Jerusalema ikhaya lami",
+        "Ngilondoloze",
+        "Uhambe nami",
+        "Zungangishiyi lana",
+        "Jerusalema ikhaya lami",
+        "Ngilondoloze",
+        "Uhambe nami",
+        "Zungangishiyi lana",
+        "Ndawo yami ayikho lana",
+        "Mbuso wami awukho lana",
+        "Ngilondoloze",
+        "Zuhambe nami",
+        "Ndawo yami ayikho lana",
+        "Mbuso wami awukho lana",
+        "Ngilondoloze",
+        "Zuhambe nami",
+        "Ngilondoloze",
+        "Ngilondoloze",
+        "Ngilondoloze",
+        "Zungangishiyi lana",
+        "Ngilondoloze",
+        "Ngilondoloze",
+        "Ngilondoloze",
+        "Zungangishiyi lana",
+        "Ndawo yami ayikho lana",
+        "Mbuso wami awukho lana",
+        "Ngilondoloze",
+        "Zuhambe nami",
+        "Ndawo yami ayikho lana",
+        "Mbuso wami awukho lana",
+        "Ngilondoloze",
+        "Zuhambe nami",
+        
+      ],
+      englishTranslation: [
+        "Jerusalem is my home",
+        "Save me",
+        "Walk with me",
+        "Don't leave me here",
+        "Jerusalem is my home",
+        "Save me",
+        "Walk with me",
+        "Don't leave me here",
+        "My place is not here",
+        "My kingdom is not here",
+        "Save me",
+        "Walk with me",
+        "My place is not here",
+        "My kingdom is not here",
+        "Save me",
+        "Walk with me",
+        "Save me",
+        "Save me",
+        "Save me",
+        "Don't leave me here",
+        "Save me",
+        "Save me",
+        "Save me",
+        "Don't leave me here",
+        "My place is not here",
+        "My kingdom is not here",
+        "Save me",
+        "Walk with me",
+        "My place is not here",
+        "My kingdom is not here",
+        "Save me",
+        "Walk with me",
+       
+      ]
+    },
+    {
+      id: 3,
       title: "Shosholoza",
       artist: "Traditional",
       duration: "3:45",
@@ -88,7 +166,7 @@ const Music = () => {
       ]
     },
     {
-      id: 3,
+      id: 4,
       title: "Senzeni Na?",
       artist: "Traditional Protest Song",
       duration: "4:12",
@@ -108,7 +186,7 @@ const Music = () => {
       ]
     },
     {
-      id: 4,
+      id: 5,
       title: "Nkosi Sikelel' iAfrika",
       artist: "Enoch Sontonga",
       duration: "2:58",
@@ -153,16 +231,34 @@ const Music = () => {
 
   // Karaoke progression effect
   useEffect(() => {
-    if (!karaokeActive || currentPlaying !== 1) return;
+    if (!karaokeActive || (currentPlaying !== 1 && currentPlaying !== 2)) return;
 
-    console.log('🎵 Starting karaoke progression');
+    // Use different intervals for different songs
+    const intervalMs = currentPlaying === 1 ? 3000 : 4000; // 3 seconds for Ulithemba Lami, 4 seconds for Jerusalema
+    
+    console.log(`🎵 Starting karaoke progression (${intervalMs/1000}s intervals)`);
     const interval = setInterval(() => {
       setCurrentLine(prev => {
-        const next = (prev + 1) % 16; // 16 lines in the song
-        console.log(`🎵 Karaoke: Line ${next} - "${songs[0].zuluLyrics[next]}"`);
-        return next;
+        const songIndex = currentPlaying === 1 ? 0 : 1; // Ulithemba Lami or Jerusalema
+        const totalLines = songs[songIndex].zuluLyrics.length;
+        const next = prev + 1;
+        
+        // For Jerusalema, go through all lines from first to last
+        if (currentPlaying === 2) {
+          if (next >= totalLines) {
+            console.log(`🎵 Karaoke: Reached end of Jerusalema at line ${prev}`);
+            return prev; // Stay at the last line
+          }
+          console.log(`🎵 Karaoke: Line ${next} - "${songs[songIndex].zuluLyrics[next]}"`);
+          return next;
+        } else {
+          // For Ulithemba Lami, cycle through lines
+          const cycledNext = next % totalLines;
+          console.log(`🎵 Karaoke: Line ${cycledNext} - "${songs[songIndex].zuluLyrics[cycledNext]}"`);
+          return cycledNext;
+        }
       });
-    }, 3000);
+    }, intervalMs);
 
     return () => {
       console.log('🎵 Stopping karaoke progression');
@@ -214,9 +310,9 @@ const Music = () => {
           audioRef.current.pause();
         }
         
-        // Use actual audio for Ulithemba Lami (id: 1), mock audio for others
-        if (songId === 1) {
-          // Use actual audio file for Ulithemba Lami
+        // Use actual audio for Ulithemba Lami (id: 1) and Jerusalema (id: 2), mock audio for others
+        if (songId === 1 || songId === 2) {
+          // Use actual audio file for Ulithemba Lami or Jerusalema
           const audio = new Audio(song.audio);
           audioRef.current = audio;
           
@@ -228,24 +324,14 @@ const Music = () => {
           let source: MediaElementAudioSourceNode;
           let vocalDetectionActive = false;
           
-          // Custom timing for Ulithemba Lami - synchronized with actual vocals
-          const vocalTiming = [
-            0,      // "Uthando lwakho lujulile" - starts immediately
-            7000,   // "Lususa ukwesaba ah" - 7 seconds
-            14000,  // "Alujiki lumi njalo" - 14 seconds
-            21000,  // "Lususa I- Izono" - 21 seconds
-            28000,  // "Uthando lwakho lujulile" - 28 seconds (repeat)
-            35000,  // "Lususa ukwesaba ah" - 35 seconds
-            42000,  // "Alujiki lumi njalo" - 42 seconds
-            49000,  // "Lisusa I- Izono" - 49 seconds
-            56000,  // "Sohlala kuwe (sohlala kuwe)" - 56 seconds
-            63000,  // "Sohlala kuwe (nsuku zonke)" - 63 seconds
-            70000,  // "Thina (singabantwana bakho)" - 70 seconds
-            77000,  // "Wena wedwa (ufanelwe ukubongwa uyiNkosi yethu)" - 77 seconds
-            84000,  // "Sohlala kuwe (sohlala kuwe)" - 84 seconds
-            91000,  // "Sohlala kuwe (nsuku zonke)" - 91 seconds
-            98000,  // "Singabantwana (singabantwana bakho) hallelujah" - 98 seconds
-            105000  // "Umusa wakho awuphezi uyasivikela ah" - 105 seconds
+          // Custom timing for songs - synchronized with actual vocals
+          const vocalTiming = songId === 1 ? [
+            // Ulithemba Lami timing
+            0, 7000, 14000, 21000, 28000, 35000, 42000, 49000, 56000, 63000, 70000, 77000, 84000, 91000, 98000, 105000
+          ] : [
+            // Jerusalema timing - 4 seconds per line for all 33 lines
+            0, 4000, 8000, 12000, 16000, 20000, 24000, 28000, 32000, 36000, 40000, 44000, 48000, 52000, 56000, 60000,
+            64000, 68000, 72000, 76000, 80000, 84000, 88000, 92000, 96000, 100000, 104000, 108000, 112000, 116000, 120000, 124000, 128000
           ];
           
           const startVocalDetection = () => {
@@ -296,7 +382,8 @@ const Music = () => {
                 // Always update line based on timing, but log vocal energy
                 if (currentLineIndex !== currentLine) {
                   setCurrentLine(currentLineIndex);
-                  console.log(`🎵 VOCAL: Line ${currentLineIndex} at ${currentTime}ms - "${songs[0].zuluLyrics[currentLineIndex]}" (Energy: ${averageVocalEnergy.toFixed(1)})`);
+                  const songIndex = songId === 1 ? 0 : 1;
+                  console.log(`🎵 VOCAL: Line ${currentLineIndex} at ${currentTime}ms - "${songs[songIndex].zuluLyrics[currentLineIndex]}" (Energy: ${averageVocalEnergy.toFixed(1)})`);
                 }
                 
                 // Log vocal energy every second for debugging
@@ -316,26 +403,56 @@ const Music = () => {
           };
           
           const startSimpleTiming = () => {
-            console.log('🎵 Using simple timing fallback');
+            const timingIntervalMs = songId === 1 ? 3000 : 4000; // 3 seconds for Ulithemba Lami, 4 seconds for Jerusalema
+            console.log(`🎵 Using simple timing fallback (${timingIntervalMs/1000} seconds)`);
             let testLine = 0;
+            const songIndex = songId === 1 ? 0 : 1;
+            const totalLines = songs[songIndex].zuluLyrics.length;
             const testInterval = setInterval(() => {
-              testLine = (testLine + 1) % 16;
+              testLine = testLine + 1;
+              
+              // For Jerusalema, go through all lines from first to last
+              if (songId === 2) {
+                if (testLine >= totalLines) {
+                  console.log(`🎵 TIMING: Reached end of Jerusalema at line ${testLine - 1}`);
+                  return; // Stop the interval
+                }
+              } else {
+                // For Ulithemba Lami, cycle through lines
+                testLine = testLine % totalLines;
+              }
+              
               setCurrentLine(testLine);
-              console.log(`🎵 TIMING: Line ${testLine} - "${songs[0].zuluLyrics[testLine]}"`);
-            }, 3000);
+              console.log(`🎵 TIMING: Line ${testLine} - "${songs[songIndex].zuluLyrics[testLine]}"`);
+            }, timingIntervalMs);
             
             (window as any).testInterval = testInterval;
           };
           
           // Backup timer to ensure lyrics move
           const startBackupTimer = () => {
-            console.log('🎵 Starting backup timer (7 seconds)');
+            const backupIntervalMs = songId === 1 ? 7000 : 4000; // 7 seconds for Ulithemba Lami, 4 seconds for Jerusalema
+            console.log(`🎵 Starting backup timer (${backupIntervalMs/1000} seconds)`);
             let backupLine = 0;
+            const songIndex = songId === 1 ? 0 : 1;
+            const totalLines = songs[songIndex].zuluLyrics.length;
             const backupInterval = setInterval(() => {
-              backupLine = (backupLine + 1) % 16;
+              backupLine = backupLine + 1;
+              
+              // For Jerusalema, go through all lines from first to last
+              if (songId === 2) {
+                if (backupLine >= totalLines) {
+                  console.log(`🎵 BACKUP: Reached end of Jerusalema at line ${backupLine - 1}`);
+                  return; // Stop the interval
+                }
+              } else {
+                // For Ulithemba Lami, cycle through lines
+                backupLine = backupLine % totalLines;
+              }
+              
               setCurrentLine(backupLine);
-              console.log(`🎵 BACKUP: Line ${backupLine} - "${songs[0].zuluLyrics[backupLine]}"`);
-            }, 7000); // 7 seconds as requested
+              console.log(`🎵 BACKUP: Line ${backupLine} - "${songs[songIndex].zuluLyrics[backupLine]}"`);
+            }, backupIntervalMs);
             
             (window as any).backupInterval = backupInterval;
           };

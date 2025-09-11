@@ -1,13 +1,16 @@
 
-import { Book, Play, Star, Clock, Award, Target, Users, Calendar, CheckCircle, Lock, Trophy, TrendingUp, BookOpen, Headphones, Mic, Globe, X } from "lucide-react";
+import { Book, Play, Star, Clock, Award, Target, Users, Calendar, CheckCircle, Lock, Trophy, TrendingUp, BookOpen, Headphones, Mic, Globe, X, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
+import { useUserProgress } from "../contexts/UserProgressContext";
 
 const Courses = () => {
+  const { userProgress, isLoading } = useUserProgress();
+  
   // SEO setup
   document.title = "Zulu Language Courses - Learn Zulu | Learn Zulu";
   document.querySelector('meta[name="description"]')?.setAttribute('content', 
@@ -17,16 +20,47 @@ const Courses = () => {
     'Master Zulu step by step with our structured learning path. Choose from beginner to advanced courses with interactive lessons.');
   document.querySelector('meta[property="og:url"]')?.setAttribute('content', '/courses');
   
-  // Mock user data - in a real app this would come from context/API
-  const userStats = {
-    totalLessonsCompleted: 12,
-    totalLessons: 26,
-    currentStreak: 7,
-    totalStudyTime: "8.5 hrs",
-    averageScore: 87,
-    badges: 5,
-    level: "Intermediate",
-    experience: 1250
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-green-600 mx-auto mb-4" />
+          <p className="text-gray-600">Loading your progress...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Get user stats from real progress data
+  const userStats = userProgress ? {
+    totalLessonsCompleted: userProgress.lessonsCompleted,
+    totalLessons: userProgress.totalLessons,
+    currentStreak: userProgress.currentStreak,
+    totalStudyTime: `${userProgress.studyTime.toFixed(1)} hrs`,
+    averageScore: userProgress.averageScore,
+    badges: userProgress.badgesEarned.length,
+    level: userProgress.currentLevel,
+    experience: Math.round(userProgress.lessonsCompleted * 50 + userProgress.studyTime * 10)
+  } : {
+    totalLessonsCompleted: 0,
+    totalLessons: 0,
+    currentStreak: 0,
+    totalStudyTime: "0.0 hrs",
+    averageScore: 0,
+    badges: 0,
+    level: "Beginner",
+    experience: 0
+  };
+
+  // Get real module progress from user data
+  const getModuleProgress = (moduleId: string) => {
+    if (!userProgress) return { completed: 0, locked: true };
+    const moduleProgress = userProgress.moduleProgress.find(mp => mp.moduleId === moduleId);
+    return moduleProgress ? { 
+      completed: moduleProgress.lessonsCompleted, 
+      locked: false 
+    } : { completed: 0, locked: true };
   };
 
   const courses = [
@@ -34,25 +68,64 @@ const Courses = () => {
       id: 1,
       title: "Complete Zulu Language Course",
       level: "Beginner to Advanced",
-      lessons: 26,
+      lessons: userStats.totalLessons,
       duration: "15 hrs",
       description: "Master Zulu from basics to fluency with comprehensive lessons covering pronunciation, vocabulary, grammar, and cultural context",
-      progress: 46, // 12/26 lessons completed
-      completedLessons: 12,
-      totalLessons: 26,
+      progress: userStats.totalLessons > 0 ? Math.round((userStats.totalLessonsCompleted / userStats.totalLessons) * 100) : 0,
+      completedLessons: userStats.totalLessonsCompleted,
+      totalLessons: userStats.totalLessons,
       rating: 4.8,
       students: 1247,
-      lastAccessed: "2 days ago",
-      nextLesson: "Lesson 13: Advanced Greetings",
+      lastAccessed: userProgress?.lastActivityDate ? 
+        new Date(userProgress.lastActivityDate).toLocaleDateString() : 
+        "Never",
+      nextLesson: userStats.totalLessonsCompleted < userStats.totalLessons ? 
+        `Lesson ${userStats.totalLessonsCompleted + 1}` : 
+        "Course Complete!",
       comingSoon: false,
       modules: [
-        { id: 1, title: "Pronunciation Fundamentals", lessons: 5, completed: 5, locked: false },
-        { id: 2, title: "Basic Greetings & Introductions", lessons: 4, completed: 4, locked: false },
-        { id: 3, title: "Numbers & Counting", lessons: 3, completed: 3, locked: false },
-        { id: 4, title: "Advanced Greetings", lessons: 4, completed: 0, locked: false },
-        { id: 5, title: "Family & Relationships", lessons: 3, completed: 0, locked: true },
-        { id: 6, title: "Daily Conversations", lessons: 4, completed: 0, locked: true },
-        { id: 7, title: "Cultural Context", lessons: 3, completed: 0, locked: true }
+        { 
+          id: 1, 
+          title: "Pronunciation Fundamentals", 
+          lessons: 5, 
+          completed: getModuleProgress('pronunciation-fundamentals').completed, 
+          locked: getModuleProgress('pronunciation-fundamentals').locked 
+        },
+        { 
+          id: 2, 
+          title: "Basic Greetings & Introductions", 
+          lessons: 4, 
+          completed: getModuleProgress('basic-greetings').completed, 
+          locked: getModuleProgress('basic-greetings').locked 
+        },
+        { 
+          id: 3, 
+          title: "Numbers & Counting", 
+          lessons: 3, 
+          completed: getModuleProgress('numbers-counting').completed, 
+          locked: getModuleProgress('numbers-counting').locked 
+        },
+        { 
+          id: 4, 
+          title: "Advanced Greetings", 
+          lessons: 4, 
+          completed: getModuleProgress('advanced-greetings').completed, 
+          locked: getModuleProgress('advanced-greetings').locked 
+        },
+        { 
+          id: 5, 
+          title: "Family & Relationships", 
+          lessons: 3, 
+          completed: getModuleProgress('family-relationships').completed, 
+          locked: getModuleProgress('family-relationships').locked 
+        },
+        { 
+          id: 6, 
+          title: "Daily Conversations", 
+          lessons: 4, 
+          completed: getModuleProgress('daily-conversations').completed, 
+          locked: getModuleProgress('daily-conversations').locked 
+        }
       ],
       features: ["Native Audio", "Interactive Quizzes", "Progress Tracking", "Cultural Notes", "Practice Exercises"],
       certificate: true
