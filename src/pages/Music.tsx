@@ -8,13 +8,13 @@ import { useToast } from "@/hooks/use-toast";
 const Music = () => {
   // SEO setup
   document.title = "Traditional Zulu Songs & Music - Learn Zulu";
-  document.querySelector('meta[name="description"]')?.setAttribute('content', 
+  document.querySelector('meta[name="description"]')?.setAttribute('content',
     'Learn Zulu through beautiful traditional songs. Listen to native pronunciation, read Zulu lyrics with English translations, and understand cultural context.');
   document.querySelector('meta[property="og:title"]')?.setAttribute('content', 'Traditional Zulu Songs & Music - Learn Zulu');
-  document.querySelector('meta[property="og:description"]')?.setAttribute('content', 
+  document.querySelector('meta[property="og:description"]')?.setAttribute('content',
     'Learn Zulu through beautiful traditional songs with native pronunciation and cultural context.');
   document.querySelector('meta[property="og:url"]')?.setAttribute('content', '/music');
-  
+
   const [currentPlaying, setCurrentPlaying] = useState<number | null>(null);
   const [currentLine, setCurrentLine] = useState<number>(0);
   const [karaokeActive, setKaraokeActive] = useState<boolean>(false);
@@ -25,6 +25,84 @@ const Music = () => {
   const songs = [
     {
       id: 1,
+      title: "Jerusalema",
+      artist: "Master KG feat. Nomcebo",
+      duration: "5:30",
+      difficulty: "Intermediate",
+      audio: "/Voices/Master KG - Jerusalema [Feat (mp3cut.net) (1).mp3",
+      zuluLyrics: [
+        "Jerusalema ikhaya lami",
+        "Ngilondoloze",
+        "Uhambe nami",
+        "Zungangishiyi lana",
+        "Jerusalema ikhaya lami",
+        "Ngilondoloze",
+        "Uhambe nami",
+        "Zungangishiyi lana",
+        "Ndawo yami ayikho lana",
+        "Mbuso wami awukho lana",
+        "Ngilondoloze",
+        "Zuhambe nami",
+        "Ndawo yami ayikho lana",
+        "Mbuso wami awukho lana",
+        "Ngilondoloze",
+        "Zuhambe nami",
+        "Ngilondoloze",
+        "Ngilondoloze",
+        "Ngilondoloze",
+        "Zungangishiyi lana",
+        "Ngilondoloze",
+        "Ngilondoloze",
+        "Ngilondoloze",
+        "Zungangishiyi lana",
+        "Ndawo yami ayikho lana",
+        "Mbuso wami awukho lana",
+        "Ngilondoloze",
+        "Zuhambe nami",
+        "Ndawo yami ayikho lana",
+        "Mbuso wami awukho lana",
+        "Ngilondoloze",
+        "Zuhambe nami",
+
+      ],
+      englishTranslation: [
+        "Jerusalem is my home",
+        "Save me",
+        "Walk with me",
+        "Don't leave me here",
+        "Jerusalem is my home",
+        "Save me",
+        "Walk with me",
+        "Don't leave me here",
+        "My place is not here",
+        "My kingdom is not here",
+        "Save me",
+        "Walk with me",
+        "My place is not here",
+        "My kingdom is not here",
+        "Save me",
+        "Walk with me",
+        "Save me",
+        "Save me",
+        "Save me",
+        "Don't leave me here",
+        "Save me",
+        "Save me",
+        "Save me",
+        "Don't leave me here",
+        "My place is not here",
+        "My kingdom is not here",
+        "Save me",
+        "Walk with me",
+        "My place is not here",
+        "My kingdom is not here",
+        "Save me",
+        "Walk with me",
+
+      ]
+    },
+    {
+      id: 2,
       title: "Ulithemba Lami",
       artist: "Joyous Celebration",
       duration: "5:30",
@@ -68,84 +146,6 @@ const Music = () => {
       ]
     },
     {
-      id: 2,
-      title: "Jerusalema",
-      artist: "Master KG feat. Nomcebo",
-      duration: "5:30",
-      difficulty: "Intermediate",
-      audio: "/Voices/Master KG - Jerusalema [Feat (mp3cut.net) (1).mp3",
-      zuluLyrics: [
-        "Jerusalema ikhaya lami",
-        "Ngilondoloze",
-        "Uhambe nami",
-        "Zungangishiyi lana",
-        "Jerusalema ikhaya lami",
-        "Ngilondoloze",
-        "Uhambe nami",
-        "Zungangishiyi lana",
-        "Ndawo yami ayikho lana",
-        "Mbuso wami awukho lana",
-        "Ngilondoloze",
-        "Zuhambe nami",
-        "Ndawo yami ayikho lana",
-        "Mbuso wami awukho lana",
-        "Ngilondoloze",
-        "Zuhambe nami",
-        "Ngilondoloze",
-        "Ngilondoloze",
-        "Ngilondoloze",
-        "Zungangishiyi lana",
-        "Ngilondoloze",
-        "Ngilondoloze",
-        "Ngilondoloze",
-        "Zungangishiyi lana",
-        "Ndawo yami ayikho lana",
-        "Mbuso wami awukho lana",
-        "Ngilondoloze",
-        "Zuhambe nami",
-        "Ndawo yami ayikho lana",
-        "Mbuso wami awukho lana",
-        "Ngilondoloze",
-        "Zuhambe nami",
-        
-      ],
-      englishTranslation: [
-        "Jerusalem is my home",
-        "Save me",
-        "Walk with me",
-        "Don't leave me here",
-        "Jerusalem is my home",
-        "Save me",
-        "Walk with me",
-        "Don't leave me here",
-        "My place is not here",
-        "My kingdom is not here",
-        "Save me",
-        "Walk with me",
-        "My place is not here",
-        "My kingdom is not here",
-        "Save me",
-        "Walk with me",
-        "Save me",
-        "Save me",
-        "Save me",
-        "Don't leave me here",
-        "Save me",
-        "Save me",
-        "Save me",
-        "Don't leave me here",
-        "My place is not here",
-        "My kingdom is not here",
-        "Save me",
-        "Walk with me",
-        "My place is not here",
-        "My kingdom is not here",
-        "Save me",
-        "Walk with me",
-       
-      ]
-    },
-    {
       id: 3,
       title: "Shosholoza",
       artist: "Traditional",
@@ -161,7 +161,7 @@ const Music = () => {
       englishTranslation: [
         "Keep going, through those mountains",
         "Train coming from South Africa",
-        "Keep going, through those mountains", 
+        "Keep going, through those mountains",
         "Train coming from South Africa"
       ]
     },
@@ -234,17 +234,17 @@ const Music = () => {
     if (!karaokeActive || (currentPlaying !== 1 && currentPlaying !== 2)) return;
 
     // Use different intervals for different songs
-    const intervalMs = currentPlaying === 1 ? 3000 : 4000; // 3 seconds for Ulithemba Lami, 4 seconds for Jerusalema
-    
-    console.log(`🎵 Starting karaoke progression (${intervalMs/1000}s intervals)`);
+    const intervalMs = currentPlaying === 1 ? 4000 : 3000; // 4 seconds for Jerusalema, 3 seconds for Ulithemba Lami
+
+    console.log(`🎵 Starting karaoke progression (${intervalMs / 1000}s intervals)`);
     const interval = setInterval(() => {
       setCurrentLine(prev => {
-        const songIndex = currentPlaying === 1 ? 0 : 1; // Ulithemba Lami or Jerusalema
+        const songIndex = currentPlaying === 1 ? 0 : 1; // Jerusalema or Ulithemba Lami
         const totalLines = songs[songIndex].zuluLyrics.length;
         const next = prev + 1;
-        
+
         // For Jerusalema, go through all lines from first to last
-        if (currentPlaying === 2) {
+        if (currentPlaying === 1) {
           if (next >= totalLines) {
             console.log(`🎵 Karaoke: Reached end of Jerusalema at line ${prev}`);
             return prev; // Stay at the last line
@@ -271,21 +271,21 @@ const Music = () => {
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
-    
+
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
-    
+
     oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
     oscillator.type = 'sine';
-    
+
     gainNode.gain.setValueAtTime(0, audioContext.currentTime);
     gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
     gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + duration - 0.1);
     gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration);
-    
+
     oscillator.start(audioContext.currentTime);
     oscillator.stop(audioContext.currentTime + duration);
-    
+
     return { oscillator, audioContext, duration };
   };
 
@@ -309,52 +309,52 @@ const Music = () => {
         if (audioRef.current) {
           audioRef.current.pause();
         }
-        
-        // Use actual audio for Ulithemba Lami (id: 1) and Jerusalema (id: 2), mock audio for others
+
+        // Use actual audio for Jerusalema (id: 1) and Ulithemba Lami (id: 2), mock audio for others
         if (songId === 1 || songId === 2) {
-          // Use actual audio file for Ulithemba Lami or Jerusalema
+          // Use actual audio file for Jerusalema or Ulithemba Lami
           const audio = new Audio(song.audio);
           audioRef.current = audio;
-          
+
           console.log('🎵 Attempting to load audio:', song.audio);
-          
+
           // Vocal detection setup
           let audioContext: AudioContext;
           let analyser: AnalyserNode;
           let source: MediaElementAudioSourceNode;
           let vocalDetectionActive = false;
-          
+
           // Custom timing for songs - synchronized with actual vocals
           const vocalTiming = songId === 1 ? [
-            // Ulithemba Lami timing
-            0, 7000, 14000, 21000, 28000, 35000, 42000, 49000, 56000, 63000, 70000, 77000, 84000, 91000, 98000, 105000
-          ] : [
             // Jerusalema timing - 4 seconds per line for all 33 lines
             0, 4000, 8000, 12000, 16000, 20000, 24000, 28000, 32000, 36000, 40000, 44000, 48000, 52000, 56000, 60000,
             64000, 68000, 72000, 76000, 80000, 84000, 88000, 92000, 96000, 100000, 104000, 108000, 112000, 116000, 120000, 124000, 128000
+          ] : [
+            // Ulithemba Lami timing
+            0, 7000, 14000, 21000, 28000, 35000, 42000, 49000, 56000, 63000, 70000, 77000, 84000, 91000, 98000, 105000
           ];
-          
+
           const startVocalDetection = () => {
             try {
               audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
               analyser = audioContext.createAnalyser();
               source = audioContext.createMediaElementSource(audio);
-              
+
               source.connect(analyser);
               analyser.connect(audioContext.destination);
-              
+
               analyser.fftSize = 2048;
               const bufferLength = analyser.frequencyBinCount;
               const dataArray = new Uint8Array(bufferLength);
-              
+
               vocalDetectionActive = true;
               console.log('🎵 Vocal detection started');
-              
+
               const detectVocals = () => {
                 if (!vocalDetectionActive) return;
-                
+
                 analyser.getByteFrequencyData(dataArray);
-                
+
                 // Analyze vocal frequencies (typically 85Hz - 255Hz for human voice)
                 let vocalEnergy = 0;
                 for (let i = 0; i < bufferLength; i++) {
@@ -363,12 +363,12 @@ const Music = () => {
                     vocalEnergy += dataArray[i];
                   }
                 }
-                
+
                 const averageVocalEnergy = vocalEnergy / (bufferLength * 0.1); // Normalize
-                
+
                 // Get current audio time
                 const currentTime = audio.currentTime * 1000; // Convert to milliseconds
-                
+
                 // Find which line should be highlighted based on vocal timing
                 let currentLineIndex = 0;
                 for (let i = 0; i < vocalTiming.length; i++) {
@@ -378,22 +378,22 @@ const Music = () => {
                     break;
                   }
                 }
-                
+
                 // Always update line based on timing, but log vocal energy
                 if (currentLineIndex !== currentLine) {
                   setCurrentLine(currentLineIndex);
                   const songIndex = songId === 1 ? 0 : 1;
                   console.log(`🎵 VOCAL: Line ${currentLineIndex} at ${currentTime}ms - "${songs[songIndex].zuluLyrics[currentLineIndex]}" (Energy: ${averageVocalEnergy.toFixed(1)})`);
                 }
-                
+
                 // Log vocal energy every second for debugging
                 if (Math.floor(currentTime / 1000) !== Math.floor((currentTime - 16.67) / 1000)) {
-                  console.log(`🎵 Vocal Energy: ${averageVocalEnergy.toFixed(1)} at ${(currentTime/1000).toFixed(1)}s`);
+                  console.log(`🎵 Vocal Energy: ${averageVocalEnergy.toFixed(1)} at ${(currentTime / 1000).toFixed(1)}s`);
                 }
-                
+
                 requestAnimationFrame(detectVocals);
               };
-              
+
               detectVocals();
             } catch (error) {
               console.error('Vocal detection error:', error);
@@ -401,18 +401,18 @@ const Music = () => {
               startSimpleTiming();
             }
           };
-          
+
           const startSimpleTiming = () => {
-            const timingIntervalMs = songId === 1 ? 3000 : 4000; // 3 seconds for Ulithemba Lami, 4 seconds for Jerusalema
-            console.log(`🎵 Using simple timing fallback (${timingIntervalMs/1000} seconds)`);
+            const timingIntervalMs = songId === 1 ? 4000 : 3000; // 4 seconds for Jerusalema, 3 seconds for Ulithemba Lami
+            console.log(`🎵 Using simple timing fallback (${timingIntervalMs / 1000} seconds)`);
             let testLine = 0;
             const songIndex = songId === 1 ? 0 : 1;
             const totalLines = songs[songIndex].zuluLyrics.length;
             const testInterval = setInterval(() => {
               testLine = testLine + 1;
-              
+
               // For Jerusalema, go through all lines from first to last
-              if (songId === 2) {
+              if (songId === 1) {
                 if (testLine >= totalLines) {
                   console.log(`🎵 TIMING: Reached end of Jerusalema at line ${testLine - 1}`);
                   return; // Stop the interval
@@ -421,26 +421,26 @@ const Music = () => {
                 // For Ulithemba Lami, cycle through lines
                 testLine = testLine % totalLines;
               }
-              
+
               setCurrentLine(testLine);
               console.log(`🎵 TIMING: Line ${testLine} - "${songs[songIndex].zuluLyrics[testLine]}"`);
             }, timingIntervalMs);
-            
+
             (window as any).testInterval = testInterval;
           };
-          
+
           // Backup timer to ensure lyrics move
           const startBackupTimer = () => {
-            const backupIntervalMs = songId === 1 ? 7000 : 4000; // 7 seconds for Ulithemba Lami, 4 seconds for Jerusalema
-            console.log(`🎵 Starting backup timer (${backupIntervalMs/1000} seconds)`);
+            const backupIntervalMs = songId === 1 ? 4000 : 7000; // 4 seconds for Jerusalema, 7 seconds for Ulithemba Lami
+            console.log(`🎵 Starting backup timer (${backupIntervalMs / 1000} seconds)`);
             let backupLine = 0;
             const songIndex = songId === 1 ? 0 : 1;
             const totalLines = songs[songIndex].zuluLyrics.length;
             const backupInterval = setInterval(() => {
               backupLine = backupLine + 1;
-              
+
               // For Jerusalema, go through all lines from first to last
-              if (songId === 2) {
+              if (songId === 1) {
                 if (backupLine >= totalLines) {
                   console.log(`🎵 BACKUP: Reached end of Jerusalema at line ${backupLine - 1}`);
                   return; // Stop the interval
@@ -449,29 +449,29 @@ const Music = () => {
                 // For Ulithemba Lami, cycle through lines
                 backupLine = backupLine % totalLines;
               }
-              
+
               setCurrentLine(backupLine);
               console.log(`🎵 BACKUP: Line ${backupLine} - "${songs[songIndex].zuluLyrics[backupLine]}"`);
             }, backupIntervalMs);
-            
+
             (window as any).backupInterval = backupInterval;
           };
-          
+
           audio.addEventListener('loadeddata', () => {
             console.log('🎵 Audio loaded successfully, duration:', audio.duration);
             setCurrentPlaying(songId);
             setCurrentLine(0);
             audio.play();
-            
+
             // Start vocal detection
             startVocalDetection();
-            
+
             // Start backup timer as safety net
             setTimeout(() => {
               startBackupTimer();
             }, 1000);
           });
-          
+
           audio.addEventListener('ended', () => {
             console.log('🎵 Song ended');
             vocalDetectionActive = false;
@@ -484,7 +484,7 @@ const Music = () => {
             setCurrentPlaying(null);
             setCurrentLine(0);
           });
-          
+
           audio.addEventListener('error', (error) => {
             console.error('Audio playback error:', error);
             vocalDetectionActive = false;
@@ -495,14 +495,14 @@ const Music = () => {
               clearInterval((window as any).backupInterval);
             }
             toast({
-              title: "Playback Error", 
+              title: "Playback Error",
               description: "Could not load audio file.",
               variant: "destructive",
             });
             setCurrentPlaying(null);
             setCurrentLine(0);
           });
-          
+
           toast({
             title: "Now Playing",
             description: `${song.title} by ${song.artist}`,
@@ -511,10 +511,10 @@ const Music = () => {
           // Generate mock audio for other songs
           const frequencies = [440, 523, 659]; // A4, C5, E5 notes
           const mockAudio = generateMockAudio(frequencies[songId - 1] || 440, song.zuluLyrics.length * 2);
-          
+
           setCurrentPlaying(songId);
           setCurrentLine(0);
-          
+
           // Karaoke-style highlighting
           const totalDuration = song.zuluLyrics.length * 2000; // 2 seconds per line
           song.zuluLyrics.forEach((_, index) => {
@@ -524,13 +524,13 @@ const Music = () => {
               }
             }, index * 2000);
           });
-          
+
           // Auto-stop after duration
           setTimeout(() => {
             setCurrentPlaying(null);
             setCurrentLine(0);
           }, totalDuration);
-          
+
           toast({
             title: "Now Playing",
             description: `${song.title} by ${song.artist} (Mock Audio)`,
@@ -539,7 +539,7 @@ const Music = () => {
       }
     } catch (error) {
       toast({
-        title: "Playback Error", 
+        title: "Playback Error",
         description: "Could not generate audio.",
         variant: "destructive",
       });
@@ -598,7 +598,7 @@ const Music = () => {
                   </div>
                 </div>
               </CardHeader>
-              
+
               <CardContent className="p-6">
                 <div className="grid md:grid-cols-2 gap-8">
                   {/* Zulu Lyrics */}
@@ -609,15 +609,14 @@ const Music = () => {
                     </h3>
                     <div className="space-y-2">
                       {song.zuluLyrics.map((line, index) => (
-                        <p 
-                          key={index} 
-                          className={`font-medium text-lg leading-relaxed transition-all duration-500 ease-in-out ${
-                            currentPlaying === song.id && currentLine === index
+                        <p
+                          key={index}
+                          className={`font-medium text-lg leading-relaxed transition-all duration-500 ease-in-out ${currentPlaying === song.id && currentLine === index
                               ? "text-primary bg-gradient-to-r from-primary/20 to-primary/10 px-4 py-2 rounded-lg shadow-lg scale-105 transform-gpu border-l-4 border-primary animate-pulse"
                               : currentPlaying === song.id
-                              ? "text-foreground/60 opacity-70"
-                              : "text-foreground"
-                          }`}
+                                ? "text-foreground/60 opacity-70"
+                                : "text-foreground"
+                            }`}
                         >
                           {line}
                         </p>
@@ -633,13 +632,12 @@ const Music = () => {
                     </h3>
                     <div className="space-y-2">
                       {song.englishTranslation.map((line, index) => (
-                        <p 
-                          key={index} 
-                          className={`leading-relaxed transition-all duration-300 ${
-                            currentPlaying === song.id && currentLine === index
+                        <p
+                          key={index}
+                          className={`leading-relaxed transition-all duration-300 ${currentPlaying === song.id && currentLine === index
                               ? "text-accent font-medium bg-accent/10 px-2 py-1 rounded-md"
                               : "text-muted-foreground"
-                          }`}
+                            }`}
                         >
                           {line}
                         </p>
